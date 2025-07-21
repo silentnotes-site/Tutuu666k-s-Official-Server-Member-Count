@@ -6,7 +6,7 @@ const client = new Client({
     ]
 });
 
-const token = 'MTM5Njk5MzA0NTk5MTUyNjUyMQ.GTfIKo.rrwcmH8StmSf95D8J3N1QsYaTJrHFxUcUeZxG8';
+const token = process.env.TOKEN;
 const channelId = '1390354957927972894';
 
 client.once('ready', async () => {
