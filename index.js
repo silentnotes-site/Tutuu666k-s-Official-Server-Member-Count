@@ -7,15 +7,20 @@ const client = new Client({
 });
 
 const token = process.env.TOKEN;
+if (!token || token.length < 10) {
+    console.error('❌ TOKEN mancante o troppo corto');
+    process.exit(1);
+}
+
 const channelId = '1390354957927972894';
 
 client.once('ready', async () => {
-    console.log(`Bot attivo come ${client.user.tag}`);
+    console.log(`✅ Bot attivo come ${client.user.tag}`);
     const guild = client.guilds.cache.first();
-    if (!guild) return console.error('Il bot non è in nessun server');
+    if (!guild) return console.error('❌ Il bot non è in nessun server');
 
     const channel = guild.channels.cache.get(channelId);
-    if (!channel) return console.error('Canale non trovato');
+    if (!channel) return console.error('❌ Canale non trovato');
 
     const members = guild.members.cache.filter(m => !m.user.bot).size;
     await channel.setName(`〔🍪〕Members: ${members}`);
