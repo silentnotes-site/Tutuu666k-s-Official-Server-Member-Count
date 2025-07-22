@@ -10,6 +10,7 @@ const token = process.env.TOKEN;
 const channelId = '1390354957927972894';
 
 async function updateCount(guild) {
+  await guild.members.fetch();
   const members = guild.memberCount;
   const channel = guild.channels.cache.get(channelId);
   if (!channel) return;
@@ -17,10 +18,8 @@ async function updateCount(guild) {
 }
 
 client.once('ready', async () => {
-  console.log(`Bot attivo come ${client.user.tag}`);
   const guild = client.guilds.cache.first();
   if (!guild) return;
-  await guild.members.fetch();
   await updateCount(guild);
 });
 
