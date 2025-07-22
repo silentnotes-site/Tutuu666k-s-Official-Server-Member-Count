@@ -1,45 +1,42 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMembers
-    ]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers
+  ]
 });
 
 const token = process.env.TOKEN;
-if (!token || token.length < 10) {
-    console.error('❌ TOKEN mancante o troppo corto');
-    process.exit(1);
-}
-
 const channelId = '1390354957927972894';
 
-client.once('ready', async () => {
-    console.log(`✅ Bot attivo come ${client.user.tag}`);
-    const guild = client.guilds.cache.first();
-    if (!guild) return console.error('❌ Il bot non è in nessun server');
-
+async function updateCount(guild) {
+  try {
+    await guild.members.fetch();
+    const members = guild.memberCount;
     const channel = guild.channels.cache.get(channelId);
-    if (!channel) return console.error('❌ Canale non trovato');
-
-    const members = guild.members.cache.filter(m => !m.user.bot).size;
+    if (!channel) return;
     await channel.setName(`〔🍪〕Members: ${members}`);
+  } catch (err) {
+    console.error('❌ Errore updateCount:', err);
+  }
+}
+
+client.once('ready', async () => {
+  console.log(`✅ Bot attivo come ${client.user.tag}`);
+  const guild = client.guilds.cache.first();
+  if (!guild) return console.error('❌ Il bot non è in nessun server');
+  await updateCount(guild); 
 });
 
 client.on('guildMemberAdd', async (member) => {
-    const channel = member.guild.channels.cache.get(channelId);
-    if (!channel) return;
-
-    const members = member.guild.members.cache.filter(m => !m.user.bot).size;
-    await channel.setName(`〔🍪〕Members: ${members}`);
+  console.log('➡️ Nuovo membro:', member.user.tag);
+  await updateCount(member.guild); 
 });
 
 client.on('guildMemberRemove', async (member) => {
-    const channel = member.guild.channels.cache.get(channelId);
-    if (!channel) return;
-
-    const members = member.guild.members.cache.filter(m => !m.user.bot).size;
-    await channel.setName(`〔🍪〕Members: ${members}`);
+  console.log('⬅️ Membro rimosso:', member.user.tag);
+  await updateCount(member.guild);
 });
 
 client.login(token);
