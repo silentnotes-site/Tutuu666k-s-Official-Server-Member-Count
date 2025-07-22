@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
 });
@@ -9,9 +9,10 @@ const channelId = '1390354957927972894';
 async function updateCount(guild, fetchMembers) {
   if (fetchMembers) await guild.members.fetch();
   const members = guild.memberCount;
-  const channel = await guild.channels.fetch(channelId);
-  if (!channel) return;
-  await channel.setName(`〔🍪〕Members: ${members}`);
+  const channel = guild.channels.cache.get(channelId) || await guild.channels.fetch(channelId).catch(() => null);
+  if (!channel) return console.error('Canale non trovato o non accessibile');
+  if (![ChannelType.GuildVoice, ChannelType.GuildText].includes(channel.type)) return console.error('Tipo canale non valido per rinomina');
+  await channel.setName(`〔🍪〕Members: ${members}`).catch(e => console.error('Errore nel rinominare:', e));
 }
 
 client.once('ready', async () => {
@@ -21,7 +22,7 @@ client.once('ready', async () => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-  await updateCount(member.guild, true);
+  await updateCount(member.guild, false);
 });
 
 client.on('guildMemberRemove', async (member) => {
