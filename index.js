@@ -9,8 +9,8 @@ const client = new Client({
 const token = process.env.TOKEN;
 const channelId = '1390354957927972894';
 
-async function updateCount(guild) {
-  await guild.members.fetch();
+async function updateCount(guild, useFetch) {
+  if (useFetch) await guild.members.fetch();
   const members = guild.memberCount;
   const channel = guild.channels.cache.get(channelId);
   if (!channel) return;
@@ -20,15 +20,15 @@ async function updateCount(guild) {
 client.once('ready', async () => {
   const guild = client.guilds.cache.first();
   if (!guild) return;
-  await updateCount(guild);
+  await updateCount(guild, true);
 });
 
 client.on('guildMemberAdd', async (member) => {
-  await updateCount(member.guild);
+  await updateCount(member.guild, false);
 });
 
 client.on('guildMemberRemove', async (member) => {
-  await updateCount(member.guild);
+  await updateCount(member.guild, false);
 });
 
 client.login(token);
