@@ -4,7 +4,7 @@ const client = new Client({
 });
 
 const token = process.env.TOKEN;
-const channelId = '1390354957927972894';
+const channelId = '1401242406338170880';
 
 async function updateCount(guild, fetchMembers) {
   if (fetchMembers) await guild.members.fetch();
